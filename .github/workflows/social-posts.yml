@@ -1,12 +1,13 @@
 name: Beach, Please! social posts
 
-# Cron is UTC. SAST = UTC+2, so 06:00 UTC = 08:00 SAST, 10:00 = 12:00, 17:00 = 19:00.
-# GitHub can start scheduled runs several minutes late; that is normal.
+# Cron is UTC. SAST = UTC+2, so 06:07 UTC = 08:07 SAST, 10:23 = 12:23, 17:41 = 19:41.
+# Deliberately NOT on the hour: GitHub delays or drops scheduled runs at :00 when its
+# scheduler is busy. Runs can still start several minutes late; that is normal.
 on:
   schedule:
-    - cron: "0 6 * * *"
-    - cron: "0 10 * * *"
-    - cron: "0 17 * * *"
+    - cron: "7 6 * * *"
+    - cron: "23 10 * * *"
+    - cron: "41 17 * * *"
   workflow_dispatch:
     inputs:
       slot:
