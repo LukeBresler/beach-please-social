@@ -1,0 +1,83 @@
+name: Beach, Please! social posts
+
+# Cron is UTC. SAST = UTC+2, so 06:00 UTC = 08:00 SAST, 10:00 = 12:00, 17:00 = 19:00.
+# GitHub can start scheduled runs several minutes late; that is normal.
+on:
+  schedule:
+    - cron: "0 6 * * *"
+    - cron: "0 10 * * *"
+    - cron: "0 17 * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Which slot to run (manual runs only)"
+        required: false
+        default: "morning"
+        type: choice
+        options: [morning, noon, evening]
+      dry_run:
+        description: "Dry run: render only, do NOT post to Instagram"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write   # commits the generated image so Meta can fetch it
+
+concurrency:
+  group: social-posts
+  cancel-in-progress: false
+
+jobs:
+  post:
+    # KILL SWITCH: Settings > Secrets and variables > Actions > Variables,
+    # add PAUSED = true to stop all posting. Delete it (or set it to anything else) to resume.
+    if: ${{ vars.PAUSED != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '1' || '' }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Work out which slot this run is
+        id: slot
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "slot=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
+          else
+            HOUR=$((10#$(date -u +%H)))
+            if   [ "$HOUR" -ge 5 ]  && [ "$HOUR" -le 8 ];  then echo "slot=morning" >> "$GITHUB_OUTPUT"
+            elif [ "$HOUR" -ge 9 ]  && [ "$HOUR" -le 13 ]; then echo "slot=noon"    >> "$GITHUB_OUTPUT"
+            else echo "slot=evening" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Check the Instagram token (live runs only)
+        if: ${{ env.DRY_RUN == '' }}
+        run: python3 main.py verify
+
+      - name: Render post
+        run: python3 main.py render ${{ steps.slot.outputs.slot }}
+
+      - name: Commit + push generated image
+        run: |
+          git config user.name "beach-please-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add posts/
+          git diff --staged --quiet || git commit -m "Post image: ${{ steps.slot.outputs.slot }} $(date -u +%F)"
+          git push
+
+      - name: Publish to Instagram
+        run: python3 main.py publish ${{ steps.slot.outputs.slot }}

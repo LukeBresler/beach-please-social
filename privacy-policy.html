@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Beach, please!</title>
+<style>
+  :root {
+    --teal-deep: #0B7C82;
+    --teal-bright: #2FE0D6;
+    --pink: #FF4FA0;
+    --yellow: #FFDE7A;
+    --cream: #FFF8EC;
+    --ink: #0B2E33;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, var(--teal-deep), var(--teal-bright));
+    color: #fff;
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 15px;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h2 {
+    color: var(--teal-deep);
+    font-size: 20px;
+    margin-top: 40px;
+    border-bottom: 3px solid var(--yellow);
+    display: inline-block;
+    padding-bottom: 4px;
+  }
+  h3 {
+    font-size: 16px;
+    margin-top: 24px;
+    color: var(--ink);
+  }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .summary-box {
+    background: #fff;
+    border-left: 6px solid var(--pink);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 24px;
+    box-shadow: 0 2px 10px rgba(11,46,51,0.06);
+  }
+  .summary-box li { margin-bottom: 10px; }
+  .contact-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 16px;
+    box-shadow: 0 2px 10px rgba(11,46,51,0.06);
+  }
+  .contact-box a { color: var(--teal-deep); font-weight: 600; text-decoration: none; }
+  .contact-box a:hover { text-decoration: underline; }
+  footer {
+    text-align: center;
+    padding: 32px 24px 48px;
+    font-size: 13px;
+    color: #6b8e91;
+  }
+  .updated {
+    font-size: 13px;
+    color: #6b8e91;
+    margin-top: 4px;
+  }
+  .note {
+    font-size: 13px;
+    font-style: italic;
+    color: #6b8e91;
+    margin-top: 48px;
+    border-top: 1px solid #e5ddc9;
+    padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Privacy Policy</h1>
+  <p>Beach, please! — and the Beach, Please App Instagram integration</p>
+</header>
+
+<main>
+  <p class="updated"><strong>Last updated:</strong> 20 September 2026</p>
+
+  <p>This policy covers the <strong>Beach, Please App</strong> Meta Developer
+  App (used for Instagram integration) and the <strong>"Beach,
+  please!"</strong> iOS app (Cape Town Beach &amp; Tidal Pool Finder) it
+  belongs to, both operated by the same developer, Luke Bresler ("we,"
+  "us"). It explains what data the app collects, what it doesn't, and how
+  the Meta/Instagram integration works.</p>
+
+  <div class="summary-box">
+    <strong>In short:</strong>
+    <ul>
+      <li>No accounts, no sign-in.</li>
+      <li>No analytics, advertising, or crash-reporting SDKs.</li>
+      <li>Location is coarse, on-device only, and never leaves your phone.</li>
+      <li>Our Instagram integration only posts to <em>our own</em> account — it doesn't touch other people's Instagram or Facebook data.</li>
+    </ul>
+  </div>
+
+  <h2>1. Information We Collect</h2>
+
+  <h3>Location</h3>
+  <p>With your permission, the app requests a single, coarse
+  (city-block-level, not precise-GPS-level) location fix, only while the
+  app is in use — never in the background. This is used to sort beaches
+  and tidal pools by distance from you.</p>
+  <p>That location is cached <strong>only on your device</strong>, so the
+  home-screen widget can reuse it without requesting its own GPS fix. It
+  is never transmitted to our servers or to any third party. You can
+  revoke location access at any time in iOS Settings → Privacy &amp;
+  Security → Location Services; the app simply falls back to a
+  score-only ranking.</p>
+
+  <h3>App usage signals (for the App Store review prompt)</h3>
+  <p>The app records, locally on your device only and never transmitted
+  anywhere, the date you first opened it and the date of your first
+  positive interaction (such as opening a beach in Maps). This is used
+  solely to time Apple's native App Store review prompt.</p>
+
+  <h3>What we do not collect</h3>
+  <p>We do not collect your name, email, contacts, photos, precise or
+  background location, advertising identifiers, or any other personal
+  data. There is no account system, so we have no database of users.</p>
+
+  <h2>2. Live Conditions Data (Supabase)</h2>
+  <p>The app shows live wind, tide, and water-temperature conditions for
+  Cape Town's beaches, fetched read-only from a shared database using a
+  public, read-only key. This request sends no personal or
+  device-identifying data — it's identical for every user and simply
+  returns the latest shared conditions. The underlying weather, tide, and
+  sea-temperature figures come from third-party providers, refreshed on a
+  fixed schedule by our own backend, never triggered by or containing
+  data about an individual user.</p>
+
+  <h2>3. The Meta Developer App ("Beach, Please App") and Instagram</h2>
+  <p>Separately from the consumer-facing iOS app, we operate a Meta
+  Developer App named <strong>Beach, Please App</strong>. Its only purpose
+  is to let our own automated backend publish scheduled Instagram posts
+  (beach highlights and Cape Town facts) to our own Instagram Business
+  account, using the Instagram Graph API.</p>
+  <ul>
+    <li>This is a first-party, server-to-server integration — it posts on our own behalf, to our own account.</li>
+    <li>It does not implement Facebook or Instagram Login for other people, and no member of the public authenticates through it.</li>
+    <li>It does not collect, access, or store data belonging to any other Instagram or Facebook user, page, or account.</li>
+    <li>It is not used for advertising or profiling.</li>
+    <li>Access credentials are held as encrypted secrets in our automation pipeline, not accessible to app users.</li>
+  </ul>
+
+  <h2>4. Third Parties and SDKs</h2>
+  <p>The iOS app has exactly one third-party dependency — the official
+  Supabase SDK, used only as described above. We do not include any
+  advertising network, analytics SDK, or crash-reporting SDK.</p>
+
+  <h2>5. Data Retention</h2>
+  <p>Because we don't collect personal data or operate user accounts,
+  there is nothing to retain, export, or delete on our end. The only
+  stored values — your cached coarse location and local review-prompt
+  timestamps — live solely on your device and are removed automatically
+  if you delete the app.</p>
+
+  <h2>6. Children's Privacy</h2>
+  <p>The app is a general-audience recreational tool and is not directed
+  at children. It does not knowingly collect personal information from
+  anyone, of any age, since it does not collect personal information at
+  all.</p>
+
+  <h2>7. Changes to This Policy</h2>
+  <p>If our data practices change, we will update this page and the "Last
+  updated" date above, and reflect material changes in the app's release
+  notes.</p>
+
+  <h2>8. Contact</h2>
+  <div class="contact-box">
+    <p><strong>Luke Bresler</strong><br>
+    <a href="mailto:luke@realpixel.co.za">luke@realpixel.co.za</a><br>
+    <a href="https://realpixel.co.za">realpixel.co.za</a></p>
+  </div>
+
+  <p class="note">This page is the current, authoritative privacy policy
+  for both the "Beach, please!" iOS app and its Beach, Please App
+  Instagram integration.</p>
+</main>
+
+<footer>
+  &copy; 2026 Luke Bresler — Beach, please!
+</footer>
+
+</body>
+</html>
