@@ -9,12 +9,11 @@ this script never writes to Supabase.
 import os
 import requests
 
-SUPABASE_URL = os.environ.get(
-    "SUPABASE_URL", "https://dwqsxoozhoeaojhodckk.supabase.co"
-)
-SUPABASE_ANON_KEY = os.environ.get(
-    "SUPABASE_ANON_KEY",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cXN4b296aG9lYW9qaG9kY2trIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjMwNjMsImV4cCI6MjA4Njc5OTA2M30.-ZvHDG3l0rNuF482FRy_Ia3FgsyGoNHjxEFDg9xvx6E",
+# `or` (not a get() default): GitHub Actions passes an UNSET secret as an empty
+# string, which must fall back to the built-in default rather than be used as-is.
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or "https://dwqsxoozhoeaojhodckk.supabase.co"
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY") or (
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3cXN4b296aG9lYW9qaG9kY2trIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjMwNjMsImV4cCI6MjA4Njc5OTA2M30.-ZvHDG3l0rNuF482FRy_Ia3FgsyGoNHjxEFDg9xvx6E"
 )
 
 
