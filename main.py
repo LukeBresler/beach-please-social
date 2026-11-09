@@ -27,7 +27,7 @@ from beach_data import rank_all, top_of_type
 from copy_gen import beach_of_the_slot, fact_caption, _protected_line, is_safe_text
 from facts import fact_for_day
 from forecast import get_weather_line
-from image_gen import render_spot_card, render_fact_card
+from image_gen import render_spot_card, render_fact_card, pick_theme
 from supabase_client import fetch_latest_conditions, FALLBACK_CONDITIONS
 from instagram_api import publish_or_dry_run, verify_token, is_live
 
@@ -128,6 +128,7 @@ def render_morning_or_noon(slot: str) -> None:
         protection_text=_protected_line(entry["score"]),
         headline=copy["headline"],
         out_path=paths["image_local"],
+        theme=pick_theme(_today_sast().date(), slot),
     )
     _write_meta(paths, {"image_url": paths["image_url"], "caption": copy["caption"], "slot": slot})
     print(f"Rendered {paths['image_local']} -> will publish as {paths['image_url']}")
@@ -146,7 +147,8 @@ def render_evening() -> None:
     copy = fact_caption(fact, seed)
     paths = _paths("evening")
 
-    render_fact_card(opener=copy["headline"], fact_text=fact["text"], out_path=paths["image_local"])
+    render_fact_card(opener=copy["headline"], fact_text=fact["text"], out_path=paths["image_local"],
+                     theme=pick_theme(_today_sast().date(), "evening"))
     _write_meta(paths, {"image_url": paths["image_url"], "caption": copy["caption"], "slot": "evening"})
     print(f"Rendered {paths['image_local']} -> will publish as {paths['image_url']}")
 
