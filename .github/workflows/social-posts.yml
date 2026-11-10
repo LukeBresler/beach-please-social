@@ -58,6 +58,14 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "slot=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
           else
+            # Slot comes from WHICH cron fired, never from the clock: GitHub often starts
+            # scheduled runs hours late, and a clock-based guess turned late morning/noon
+            # runs into duplicate evening posts.
+            case "${{ github.event.schedule }}" in
+              "7 6 * * *")   echo "slot=morning" >> "$GITHUB_OUTPUT"; exit 0 ;;
+              "23 10 * * *") echo "slot=noon"    >> "$GITHUB_OUTPUT"; exit 0 ;;
+              "41 17 * * *") echo "slot=evening" >> "$GITHUB_OUTPUT"; exit 0 ;;
+            esac
             HOUR=$((10#$(date -u +%H)))
             if   [ "$HOUR" -ge 5 ]  && [ "$HOUR" -le 8 ];  then echo "slot=morning" >> "$GITHUB_OUTPUT"
             elif [ "$HOUR" -ge 9 ]  && [ "$HOUR" -le 13 ]; then echo "slot=noon"    >> "$GITHUB_OUTPUT"

@@ -121,6 +121,33 @@ def publish_image(image_url: str, caption: str) -> dict:
     )
 
 
+def already_posted(caption: str, hours: int = 36) -> bool:
+    """True if this exact caption is already on the account from the last `hours`.
+    Stops a delayed or repeated workflow run from posting the same thing twice.
+    If the check itself fails we warn loudly and carry on (a broken check must
+    not silently stop all posting)."""
+    from datetime import datetime, timedelta, timezone
+    try:
+        data = _request(
+            "get",
+            f"{GRAPH_BASE}/{os.environ['IG_USER_ID']}/media",
+            "Recent posts check",
+            params={"fields": "caption,timestamp", "limit": 30, "access_token": os.environ["IG_ACCESS_TOKEN"]},
+        )
+    except InstagramError as e:
+        print(f"::warning::Duplicate check could not run ({e}); posting without it")
+        return False
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    for item in data.get("data", []):
+        try:
+            when = datetime.strptime(item["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
+        except (KeyError, ValueError):
+            continue
+        if when >= cutoff and (item.get("caption") or "").strip() == caption.strip():
+            return True
+    return False
+
+
 def _print_dry_run(image_url: str, caption: str, slot: str, why: str) -> None:
     print(f"[{slot}] DRY RUN ({why}) -- would publish:")
     print(f"  image_url: {image_url}")
@@ -141,6 +168,9 @@ def publish_or_dry_run(image_url: str, caption: str, slot: str) -> None:
         return
 
     username = verify_token()
+    if already_posted(caption):
+        print(f"::warning::[{slot}] SKIPPED, nothing posted: this exact post is already on @{username} from the last 36 hours")
+        return
     wait_for_image(image_url)
     result = publish_image(image_url, caption)
     print(f"[{slot}] Published to @{username}: {result}")
