@@ -1,0 +1,72 @@
+name: Beach, Please! daily carousel
+
+# Fires when the 6:45 Claude scheduled task pushes carousel/<date>/post.json.
+# Push events start within seconds, unlike cron schedules (which GitHub often runs hours late).
+on:
+  push:
+    branches: [main]
+    paths: ["carousel/*/post.json"]
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Folder date to publish (YYYY-MM-DD, must be today in SAST)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run: check only, do NOT post to Instagram"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write   # commits published.json so a re-run can never double-post
+
+concurrency:
+  group: social-posts   # same group as the 3x/day posts, so their pushes never collide
+  cancel-in-progress: false
+
+jobs:
+  carousel:
+    # Same kill switch as the other posts: repo variable PAUSED = true stops this too.
+    if: ${{ vars.PAUSED != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '1' || '' }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Work out which day's folder to publish
+        id: which
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "date=${{ inputs.date }}" >> "$GITHUB_OUTPUT"
+          else
+            D=$(git diff --name-only HEAD~1 HEAD -- 'carousel/*/post.json' | head -1 | cut -d/ -f2)
+            echo "date=$D" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish carousel
+        if: ${{ steps.which.outputs.date != '' }}
+        run: python3 carousel.py "${{ steps.which.outputs.date }}"
+
+      - name: Record that it was published
+        if: ${{ steps.which.outputs.date != '' && env.DRY_RUN == '' }}
+        run: |
+          git config user.name "beach-please-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add carousel/
+          git diff --staged --quiet && exit 0
+          git commit -m "Carousel published: ${{ steps.which.outputs.date }}"
+          git pull --rebase -q && git push
